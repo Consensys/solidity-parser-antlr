@@ -7016,7 +7016,11 @@ SolidityParser.prototype.primaryExpression = function() {
         case 4:
             this.enterOuterAlt(localctx, 4);
             this.state = 786;
-            this.match(SolidityParser.StringLiteral);
+            let _la = this._input.LA(1);
+            while(_la===SolidityParser.StringLiteral) {
+              this.match(SolidityParser.StringLiteral);
+              _la = this._input.LA(1);
+            }
             break;
 
         case 5:
