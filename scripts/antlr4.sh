@@ -2,7 +2,7 @@
 
 set -o errexit
 
-antlr -Dlanguage=JavaScript solidity-antlr4/Solidity.g4 -o lib
+antlr4 -Dlanguage=JavaScript solidity-antlr4/Solidity.g4 -o lib
 
 mv lib/solidity-antlr4/* src/lib/
 
