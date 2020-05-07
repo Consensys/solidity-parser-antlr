@@ -146,8 +146,8 @@ describe('AST', () => {
     var ast = parseNode("constructor(uint a) public {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
-      "name": null,
       "natspec": null,
+      "name": null,
       "parameters": [
         {
           "type": "VariableDeclaration",
@@ -181,6 +181,7 @@ describe('AST', () => {
     var ast = parseNode("fallback () external {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": null,
       "parameters": [],
       "returnParameters": null,
@@ -198,11 +199,12 @@ describe('AST', () => {
       "stateMutability": null,
     })
   })
-  
+
   it('FunctionDefinition fallback old definition', () => {
     var ast = parseNode("function () external {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": '',
       "parameters": [],
       "returnParameters": null,
@@ -249,6 +251,7 @@ describe('AST', () => {
     var ast = parseNode("receive () external payable {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": null,
       "parameters": [],
       "returnParameters": null,
@@ -299,6 +302,7 @@ describe('AST', () => {
     var ast = parseNode("function foo() public override {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": "foo",
       "parameters": [],
       "returnParameters": null,
@@ -321,6 +325,7 @@ describe('AST', () => {
     var ast = parseNode("function foo() public override(Base) {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": "foo",
       "parameters": [],
       "returnParameters": null,
@@ -346,6 +351,7 @@ describe('AST', () => {
     var ast = parseNode("function foo() public override(Base1, Base2) {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": "foo",
       "parameters": [],
       "returnParameters": null,
@@ -374,8 +380,8 @@ describe('AST', () => {
     var ast = parseNode("function foo(uint a) pure {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
-      "name": "foo",
       "natspec": null,
+      "name": "foo",
       "parameters": [
         {
           "type": "VariableDeclaration",
@@ -407,6 +413,7 @@ describe('AST', () => {
      ast = parseNode("function foo() virtual public {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": "foo",
       "parameters": [],
       "returnParameters": null,
@@ -428,8 +435,8 @@ describe('AST', () => {
     ast = parseNode("function foo(uint a) pure returns (uint256) {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
-      "name": "foo",
       "natspec": null,
+      "name": "foo",
       "parameters": [
         {
           "type": "VariableDeclaration",

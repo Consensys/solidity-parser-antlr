@@ -1,4 +1,5 @@
 const antlr4 = require('./antlr4/index')
+const parseComments = require('./natspec')
 
 function toText(ctx) {
   if (ctx !== null) {
@@ -116,11 +117,18 @@ const transformAST = {
 
   ContractDefinition(ctx) {
     const name = toText(ctx.identifier())
-    const kind = toText(ctx.getChild(0))
-    
+    let natspec = null
+    let kind
+    if (ctx.natSpec()) {
+      natspec = parseComments(toText(ctx.getChild(0)))
+      kind = toText(ctx.getChild(1))
+    } else {
+      kind = toText(ctx.getChild(0))
+    }
     this._currentContract = name
 
     return {
+      natspec,
       name,
       baseContracts: this.visit(ctx.inheritanceSpecifier()),
       subNodes: this.visit(ctx.contractPart()),
@@ -152,6 +160,11 @@ const transformAST = {
     let parameters = []
     let returnParameters = null
     let visibility = 'default'
+
+    let natspec = null
+    if (ctx.natSpec()) {
+      natspec = parseComments(toText(ctx.getChild(0)))
+    }
 
     let block = null
     if (ctx.block()) {
@@ -267,7 +280,7 @@ const transformAST = {
         } else if (ctx.modifierList().PrivateKeyword(0)) {
           visibility = 'private'
         }
-        
+
         // check if function is virtual
         if (ctx.modifierList().VirtualKeyword(0)) {
           isVirtual = true
@@ -287,6 +300,7 @@ const transformAST = {
     }
 
     return {
+      natspec,
       name,
       parameters,
       returnParameters,
@@ -427,7 +441,13 @@ const transformAST = {
   },
 
   StructDefinition(ctx) {
+    let natspec = null
+    if (ctx.natSpec()) {
+      natspec = parseComments(toText(ctx.getChild(0)))
+    }
+
     return {
+      natspec,
       name: toText(ctx.identifier()),
       members: this.visit(ctx.variableDeclaration())
     }
@@ -591,12 +611,18 @@ const transformAST = {
   },
 
   ModifierDefinition(ctx) {
+    let natspec = null
+    if (ctx.natSpec()) {
+      natspec = parseComments(toText(ctx.getChild(0)))
+    }
+
     let parameters = null
     if (ctx.parameterList()) {
       parameters = this.visit(ctx.parameterList())
     }
 
     return {
+      natspec,
       name: toText(ctx.identifier()),
       parameters,
       body: this.visit(ctx.block())
@@ -823,6 +849,11 @@ const transformAST = {
     const iden = ctx.identifier()
     const name = toText(iden)
 
+    let natspec = null
+    if (ctx.natSpec()) {
+      natspec = parseComments(toText(ctx.getChild(0)))
+    }
+
     let expression = null
     if (ctx.expression()) {
       expression = this.visit(ctx.expression())
@@ -857,6 +888,7 @@ const transformAST = {
     )
 
     return {
+      natspec,
       variables: [decl],
       initialValue: expression
     }
@@ -906,7 +938,7 @@ const transformAST = {
           return value
         }
       ).join("")
-      
+
 
       return {
         type: 'StringLiteral',
@@ -1078,7 +1110,12 @@ const transformAST = {
   },
 
   EventDefinition(ctx) {
+    let natspec = null
+    if (ctx.natSpec()) {
+      natspec = parseComments(toText(ctx.getChild(0)))
+    }
     return {
+      natspec,
       name: toText(ctx.identifier()),
       parameters: this.visit(ctx.eventParameterList()),
       isAnonymous: !!ctx.AnonymousKeyword()
