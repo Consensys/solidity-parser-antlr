@@ -85,6 +85,7 @@ describe('AST', () => {
     assert.deepEqual(ast, {
       "type": "ContractDefinition",
       "name": "test",
+      "natspec": null,
       "baseContracts": [],
       "subNodes": [],
       "kind": "contract"
@@ -95,6 +96,7 @@ describe('AST', () => {
     assert.deepEqual(ast, {
       "type": "ContractDefinition",
       "name": "test",
+      "natspec": null,
       "baseContracts": [
         {
           "type": "InheritanceSpecifier",
@@ -122,6 +124,7 @@ describe('AST', () => {
     assert.deepEqual(ast, {
       "type": "ContractDefinition",
       "name": "test",
+      "natspec": null,
       "baseContracts": [],
       "subNodes": [],
       "kind": "library"
@@ -132,6 +135,7 @@ describe('AST', () => {
     assert.deepEqual(ast, {
       "type": "ContractDefinition",
       "name": "test",
+      "natspec": null,
       "baseContracts": [],
       "subNodes": [],
       "kind": "interface"
@@ -142,6 +146,7 @@ describe('AST', () => {
     var ast = parseNode("constructor(uint a) public {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": null,
       "parameters": [
         {
@@ -176,6 +181,7 @@ describe('AST', () => {
     var ast = parseNode("fallback () external {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": null,
       "parameters": [],
       "returnParameters": null,
@@ -193,11 +199,12 @@ describe('AST', () => {
       "stateMutability": null,
     })
   })
-  
+
   it('FunctionDefinition fallback old definition', () => {
     var ast = parseNode("function () external {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": '',
       "parameters": [],
       "returnParameters": null,
@@ -244,6 +251,7 @@ describe('AST', () => {
     var ast = parseNode("receive () external payable {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": null,
       "parameters": [],
       "returnParameters": null,
@@ -294,6 +302,7 @@ describe('AST', () => {
     var ast = parseNode("function foo() public override {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": "foo",
       "parameters": [],
       "returnParameters": null,
@@ -316,6 +325,7 @@ describe('AST', () => {
     var ast = parseNode("function foo() public override(Base) {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": "foo",
       "parameters": [],
       "returnParameters": null,
@@ -341,6 +351,7 @@ describe('AST', () => {
     var ast = parseNode("function foo() public override(Base1, Base2) {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": "foo",
       "parameters": [],
       "returnParameters": null,
@@ -369,6 +380,7 @@ describe('AST', () => {
     var ast = parseNode("function foo(uint a) pure {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": "foo",
       "parameters": [
         {
@@ -401,6 +413,7 @@ describe('AST', () => {
      ast = parseNode("function foo() virtual public {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": "foo",
       "parameters": [],
       "returnParameters": null,
@@ -422,6 +435,7 @@ describe('AST', () => {
     ast = parseNode("function foo(uint a) pure returns (uint256) {}")
     assert.deepEqual(ast, {
       "type": "FunctionDefinition",
+      "natspec": null,
       "name": "foo",
       "parameters": [
         {
@@ -694,6 +708,7 @@ describe('AST', () => {
     assert.deepEqual(ast, {
       "type": "StructDefinition",
       "name": "hello",
+      "natspec": null,
       "members": [
         {
           "type": "VariableDeclaration",
@@ -1098,6 +1113,7 @@ describe('AST', () => {
     assert.deepEqual(ast, {
       "type": "ModifierDefinition",
       "name": "onlyOwner",
+      "natspec": null,
       "parameters": null,
       "body": {
         "type": "Block",
@@ -1108,6 +1124,7 @@ describe('AST', () => {
     assert.deepEqual(ast, {
       "type": "ModifierDefinition",
       "name": "onlyOwner",
+      "natspec": null,
       "parameters": [],
       "body": {
         "type": "Block",
@@ -1210,7 +1227,8 @@ describe('AST', () => {
           "isIndexed": false
         }
       ],
-      "initialValue": null
+      "initialValue": null,
+      "natspec": null
     })
   })
 
@@ -1512,6 +1530,7 @@ describe('AST', () => {
     assert.deepEqual(ast, {
       "type": "EventDefinition",
       "name": "Foo",
+      "natspec": null,
       "parameters": [
         {
           "type": "VariableDeclaration",
@@ -1909,6 +1928,202 @@ describe('AST', () => {
         "type": "AssemblyCall"
       },
       "type": "AssemblyIf"
+    })
+  })
+
+  it("NatSpec multi line", function () {
+    const ast = parser.parse(
+`/**
+  * @dev This is the Sum contract.
+  * @title Sum Contract
+  * @author username
+  */
+contract Sum { }`
+    );
+    assert.deepEqual(ast.children[0], {
+      type: "ContractDefinition",
+      natspec: {
+        dev: "This is the Sum contract.",
+        title: "Sum Contract",
+        author: "username",
+      },
+      name: "Sum",
+      baseContracts: [],
+      subNodes: [],
+      kind: "contract",
+    })
+  })
+
+  it("NatSpec single line", function () {
+    const ast = parser.parse(
+`/// @dev This is the Sum contract.
+/// @title Sum Contract
+/// @author username
+contract Sum { }`
+    );
+    assert.deepEqual(ast.children[0], {
+      type: "ContractDefinition",
+      natspec: {
+        dev: "This is the Sum contract.",
+        title: "Sum Contract",
+        author: "username",
+      },
+      name: "Sum",
+      baseContracts: [],
+      subNodes: [],
+      kind: "contract",
+    })
+  })
+
+  it("NatSpec multi line event", function () {
+    const ast = parseNode(
+`/**
+  * @dev This method says hello
+  * @param user the user address
+  */
+  event sayHello(address user);`
+    );
+    assert.deepEqual(ast.natspec, {
+      dev: "This method says hello",
+      params: {
+        user: "the user address"
+      },
+    })
+  })
+
+  it("NatSpec multi line function", function () {
+    const ast = parseNode(
+`/**
+  * @dev This method transfer fund to other user
+  * @param from the address extract funds
+  * @param to the user address to give funds
+  * @param amount the amount to transfer
+  */
+ function transfer(address from, address to, uint256 amount) public {}`);
+
+    assert.deepEqual(ast.natspec, {
+      dev: "This method transfer fund to other user",
+      params: {
+        from: "the address extract funds",
+        to: "the user address to give funds",
+        amount: "the amount to transfer",
+      },
+    })
+  })
+
+  it("NatSpec multi line multiple functions in contract", function () {
+    const ast = parser.parse(
+`/**
+  * @dev The ERC20 contract
+  */
+ contract ERC20 {
+    /**
+     * @dev This method transfer fund to other user
+     * @param from the address extract funds
+     * @param to the user address to give funds
+     * @param amount the amount to transfer
+     */
+    function transfer(address from, address to, uint256 amount) public {}
+    /**
+     * @dev This method gets the approved amount
+     * @param user the user address to verify
+     * @return the approved amount
+     */
+    function approved(address user) public view returns(uint256) {}
+ }`);
+    const methods = ast.children[0].subNodes;
+    assert.deepEqual(methods[0].natspec, {
+      dev: 'This method transfer fund to other user',
+      params: {
+        from: 'the address extract funds',
+        to: 'the user address to give funds',
+        amount: 'the amount to transfer',
+      },
+    });
+    assert.deepEqual(methods[1].natspec, {
+      dev: 'This method gets the approved amount',
+      params: {
+        user: 'the user address to verify',
+      },
+      return: 'the approved amount',
+    });
+  })
+
+  it("NatSpec multi line modifier", function() {
+    var ast = parseNode(`/**
+    * @dev The onlyOwner modifier
+    * @param user the user
+    */
+   modifier onlyOwner(address user) {}`)
+    assert.deepEqual(ast.natspec, {
+      dev: 'The onlyOwner modifier',
+      params: {
+        user: 'the user',
+      },
+    })
+  })
+
+  it("NatSpec multi line struct", function() {
+    var ast = parseNode(`/**
+    * @dev The hello struct
+    * @param a the variable a
+    */
+   struct hello { uint a; }`)
+    assert.deepEqual(ast.natspec, {
+      dev: 'The hello struct',
+      params: {
+        a: 'the variable a',
+      },
+    })
+  })
+
+  it("NatSpec multi line constructor", function() {
+    var ast = parseNode(`/**
+    * @dev The hello constructor
+    * @param a the variable a
+    */
+   constructor(uint256 a) public { }`)
+    assert.deepEqual(ast.natspec, {
+      dev: 'The hello constructor',
+      params: {
+        a: 'the variable a',
+      },
+    })
+  })
+
+  it("NatSpec multi line single natspec constructor", function() {
+    var ast = parseNode(`/**
+    * @dev The hello constructor
+    *
+    * Guess what? Will keep multiline
+    * @param a the variable a
+    * Same as this one here tho!
+    */
+   constructor(uint256 a) public { }`)
+    assert.deepEqual(ast.natspec, {
+      dev: 'The hello constructor\n\nGuess what? Will keep multiline',
+      params: {
+        a: 'the variable a\nSame as this one here tho!',
+      },
+    })
+  })
+
+  it("NatSpec single line single natspec variable", function() {
+    var ast = parseNode(`
+    /// @dev This is a comment for a variable
+    uint256 internal myvar;`)
+    assert.deepEqual(ast.natspec, {
+      dev: 'This is a comment for a variable',
+    })
+  })
+
+   it("NatSpec multi line single natspec variable", function() {
+    var ast = parseNode(`/**
+    * @dev This is a comment for a variable
+    */
+   mapping (bytes32 => uint256) internal myvar;`)
+    assert.deepEqual(ast.natspec, {
+      dev: 'This is a comment for a variable',
     })
   })
 })
